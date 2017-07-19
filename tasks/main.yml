@@ -17,3 +17,14 @@
     username: "{{ db_admin_username }}"
     wait: yes
     wait_timeout: 1200
+  register: rds_result
+
+- name: Save a reference to the created RDS instance.
+  set_fact:
+    db_instance: "{{ rds_result.instance }}"
+
+- name: Create databases
+  include: setup-db.yml
+  with_dict: "{{ db_map }}"
+  loop_control:
+    loop_var: database

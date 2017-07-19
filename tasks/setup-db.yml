@@ -1,0 +1,32 @@
+---
+- name: Create database {{ database.key }}
+  local_action:
+    module: postgresql_db
+    login_host: "{{ db_instance.endpoint }}"
+    login_password: "{{ db_admin_password }}"
+    login_user: "{{ db_admin_username }}"
+    name: "{{ database.key }}"
+
+- name: Create database users
+  local_action:
+    module: postgresql_user
+    db: "{{ database.key }}"
+    login_host: "{{ db_instance.endpoint }}"
+    login_password: "{{ db_admin_password }}"
+    login_user: "{{ db_admin_username }}"
+    name: "{{ item.key }}"
+    no_password_changes: yes
+    password: "{{ item.value }}"
+    role_attr_flags: NOSUPERUSER,NOCREATEROLE,NOCREATEDB
+  with_dict: "{{ database.value.users }}"
+
+- name: Set user database permissions
+  local_action:
+    module: postgresql_privs
+    db: "{{ database.key }}"
+    login_host: "{{ db_instance.endpoint }}"
+    login_password: "{{ db_admin_password }}"
+    login_user: "{{ db_admin_username }}"
+    privs: ALL
+    role: "{{ item.key }}"
+    type: database

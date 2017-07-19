@@ -6,7 +6,7 @@ This role allows you to create a PostgreSQL database using AWS' RDS.
 Requirements
 ------------
 
-Since this role interacts with AWS, it requires the boto package be installed. The features in this role rely on `boto >= 2.26` being installed on the host the role runs on.
+Since this role interacts with AWS, it requires the boto package be installed. The features in this role rely on `boto >= 2.26` being installed on the host the role runs on. We also requires `psycopg2` to interact with the database.
 
 Role Variables
 --------------
@@ -43,6 +43,23 @@ db_instance_subnet: default
 # Credentials for the admin user
 db_admin_username: dbadmin
 db_admin_password: password
+```
+
+Each instance can host multiple databases. Databases are specified with a name and optional parameters. The users given for each database will have ALL privileges on the database.
+
+```YAML
+db_map: {}
+
+# An example of multiple databases with multiple users
+db_map:
+  mydb:
+    users:
+      john: johnpassword
+      alice: alicepassword
+
+  otherdb:
+    users:
+      phil: philpassword
 ```
 
 Dependencies

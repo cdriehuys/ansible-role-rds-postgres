@@ -15,3 +15,5 @@ db_instance_subnet: default
 
 db_admin_username: dbadmin
 db_admin_password: password
+
+db_map: {}
