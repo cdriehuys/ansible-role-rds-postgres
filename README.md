@@ -1,38 +1,73 @@
-Role Name
-=========
+cdriehuys.rds-postgres
+======================
 
-A brief description of the role goes here.
+This role allows you to create a PostgreSQL database using AWS' RDS.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Since this role interacts with AWS, it requires the boto package be installed. The features in this role rely on `boto >= 2.26` being installed on the host the role runs on.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+This role interacts with AWS, so you must set your credentials to use the role. If credentials are not provided as variables, Ansible will attempt to look them up from environment variables as described [here](http://docs.ansible.com/ansible/rds_module.html#notes).
+
+```YAML
+aws_access_key: your-access-key
+aws_secret_key: your-secret-key
+aws_region: your-aws-region
+```
+
+The role uses a few common AWS variables in order to provide default names for other parameters.
+
+```YAML
+aws_application_name: my-application
+aws_tags: {}
+```
+
+The following parameters are used when creating the database instance. You will most likely want to change these parameters as they default to the smallest values possible.
+
+```YAML
+db_instance_name: "{{ aws_application_name }}-db"
+db_instance_size: 5
+db_instance_type: db.t2.micro
+
+db_instance_default_tags:
+  application: "{{ aws_application_name }}"
+  role: database
+db_instance_tags: "{{ db_instance_default_tags | combine(aws_tags) }}"
+
+db_instance_subnet: default
+
+# Credentials for the admin user
+db_admin_username: dbadmin
+db_admin_password: password
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+N/A
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Since the role uses `local_action` commands, it makes the most sense to
+set the host to the local machine.
 
-    - hosts: servers
+    - hosts: localhost
+      connection: local
+      gather_facts: no
       roles:
-         - { role: username.rolename, x: 42 }
+         - cdriehuys.rds-postgres
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Chathan Driehuys <cdriehuys@gmail.com>

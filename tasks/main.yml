@@ -1,2 +1,19 @@
 ---
-# tasks file for rds-postgres
+- name: Create RDS instance
+  local_action:
+    module: rds
+    aws_access_key: "{{ aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ aws_secret_key | default(omit) }}"
+    command: create
+    db_engine: postgres
+    instance_name: "{{ db_instance_name }}"
+    instance_type: "{{ db_instance_type }}"
+    password: "{{ db_admin_password }}"
+    region: "{{ aws_region | default(omit) }}"
+    size: "{{ db_instance_size }}"
+    subnet: "{{ db_instance_subnet }}"
+    tags: "{{ db_instance_tags }}"
+    upgrade: yes
+    username: "{{ db_admin_username }}"
+    wait: yes
+    wait_timeout: 1200
