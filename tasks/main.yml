@@ -8,7 +8,6 @@
     name: "{{ db_instance_sg_name }}"
     region: "{{ aws_region | default(omit) }}"
     rules: "{{ db_instance_sg_rules + db_instance_sg_holes }}"
-    tags: "{{ db_instance_sg_tags }}"
   register: db_security_group
 
 - name: Create RDS instance
