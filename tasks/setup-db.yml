@@ -30,3 +30,4 @@
     privs: ALL
     role: "{{ item.key }}"
     type: database
+  with_dict: "{{ database.value.users }}"
