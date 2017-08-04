@@ -13,6 +13,22 @@ db_instance_tags: "{{ db_instance_default_tags | combine(aws_tags) }}"
 
 db_instance_subnet: default
 
+db_instance_sg_name: "{{ aws_application_name }}-db-sg"
+db_instance_sg_description: Security group for {{ aws_application_name }} databases.
+
+db_instance_sg_default_tags:
+  application: "{{ aws_application_name }}"
+  role: security group
+db_instance_sg_tags: "{{ db_instance_default_tags | combine(aws_tags) }}"
+
+db_instance_sg_rules: []
+
+db_instance_sg_holes:
+  - proto: tcp
+    from_port: 5432
+    to_port: 5432
+    cidr_ip: 0.0.0.0/0
+
 db_admin_username: dbadmin
 db_admin_password: password
 

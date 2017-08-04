@@ -45,6 +45,23 @@ db_admin_username: dbadmin
 db_admin_password: password
 ```
 
+By default, the RDS instance is created with a security group that allows access from anywhere for the duration of the role. After the role, the security group doesn't allow any access by default. If the desired rules are not known at run time, we save a reference to the created security group as `db_security_group`.
+
+```YAML
+db_instance_sg_name: "{{ aws_application_name }}-db-sg"
+db_instance_sg_description: Security group for '{{ aws_application_name }}' databases.
+
+# Override this with your desired rules
+db_instance_sg_rules: []
+
+# These are the rules that allow access when the role is running
+db_instance_sg_holes:
+  - proto: tcp
+    from_port: 5432
+    to_port: 5432
+    cidr_ip: 0.0.0.0/0
+```
+
 Each instance can host multiple databases. Databases are specified with a name and optional parameters. The users given for each database will have ALL privileges on the database.
 
 ```YAML

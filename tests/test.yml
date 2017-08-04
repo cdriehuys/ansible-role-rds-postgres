@@ -1,5 +1,10 @@
 ---
 - hosts: localhost
-  remote_user: root
+  connection: local
+  gather_facts: no
+
+  vars:
+    aws_application_name: ansible-role-rds-postgres-test
+
   roles:
-    - rds-postgres
+    - ansible-role-rds-postgres
