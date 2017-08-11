@@ -1,0 +1,52 @@
+---
+- name: Create RDS instance security group
+  local_action:
+    module: ec2_group
+    aws_access_key: "{{ aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ aws_secret_key | default(omit) }}"
+    description: "{{ db_instance_sg_description }}"
+    name: "{{ db_instance_sg_name }}"
+    region: "{{ aws_region | default(omit) }}"
+    rules: "{{ db_instance_sg_rules + db_instance_sg_holes }}"
+  register: db_security_group
+
+- name: Create RDS instance
+  local_action:
+    module: rds
+    aws_access_key: "{{ aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ aws_secret_key | default(omit) }}"
+    command: create
+    db_engine: postgres
+    instance_name: "{{ db_instance_name }}"
+    instance_type: "{{ db_instance_type }}"
+    password: "{{ db_admin_password }}"
+    region: "{{ aws_region | default(omit) }}"
+    size: "{{ db_instance_size }}"
+    subnet: "{{ db_instance_subnet }}"
+    tags: "{{ db_instance_tags }}"
+    upgrade: yes
+    username: "{{ db_admin_username }}"
+    vpc_security_groups: "{{ db_security_group.group_id }}"
+    wait: yes
+    wait_timeout: 1200
+  register: rds_result
+
+- name: Save a reference to the created RDS instance.
+  set_fact:
+    db_instance: "{{ rds_result.instance }}"
+
+- name: Create databases
+  include: setup-db.yml
+  with_dict: "{{ db_map }}"
+  loop_control:
+    loop_var: database
+
+- name: Remove holes from RDS instance security group
+  local_action:
+    module: ec2_group
+    aws_access_key: "{{ aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ aws_secret_key | default(omit) }}"
+    description: "{{ db_instance_sg_description }}"
+    name: "{{ db_instance_sg_name }}"
+    region: "{{ aws_region | default(omit) }}"
+    rules: "{{ db_instance_sg_rules }}"

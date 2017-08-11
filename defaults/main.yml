@@ -1,0 +1,30 @@
+---
+aws_application_name: my-application
+aws_tags: {}
+
+db_instance_name: "{{ aws_application_name }}-db"
+db_instance_size: 5
+db_instance_type: db.t2.micro
+
+db_instance_default_tags:
+  application: "{{ aws_application_name }}"
+  role: database
+db_instance_tags: "{{ db_instance_default_tags | combine(aws_tags) }}"
+
+db_instance_subnet: default
+
+db_instance_sg_name: "{{ aws_application_name }}-db-sg"
+db_instance_sg_description: Security group for {{ aws_application_name }} databases.
+
+db_instance_sg_rules: []
+
+db_instance_sg_holes:
+  - proto: tcp
+    from_port: 5432
+    to_port: 5432
+    cidr_ip: 0.0.0.0/0
+
+db_admin_username: dbadmin
+db_admin_password: password
+
+db_map: {}
