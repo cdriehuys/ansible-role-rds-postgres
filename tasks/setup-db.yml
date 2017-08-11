@@ -18,6 +18,7 @@
     no_password_changes: yes
     password: "{{ item.value }}"
     role_attr_flags: NOSUPERUSER,NOCREATEROLE,NOCREATEDB
+  no_log: yes
   with_dict: "{{ database.value.users }}"
 
 - name: Set user database permissions
@@ -30,4 +31,5 @@
     privs: ALL
     role: "{{ item.key }}"
     type: database
+  no_log: yes
   with_dict: "{{ database.value.users }}"
